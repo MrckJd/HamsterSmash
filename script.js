@@ -1,56 +1,65 @@
-document.addEventListener(
-    "DOMContentLoaded", function () {
-    const holes = 
-        document.querySelectorAll(".hole");
-    const startButton = 
-        document.getElementById("startButton");
-    const endButton = 
-        document.getElementById("endButton");
-    const scoreDisplay = 
-        document.getElementById("score");
-    const timerDisplay = 
-        document.getElementById("timer");
+document.addEventListener("DOMContentLoaded", function () {
+    const holes = document.querySelectorAll(".hole");
+    const startButton = document.getElementById("startButton");
+    const endButton = document.getElementById("endButton");
+    const scoreDisplay = document.getElementById("score");
+    const timerDisplay = document.getElementById("timer");
+    const healthBar = document.getElementById("health-bar");
 
     let timer;
     let score = 0;
     let countdown;
     let moleInterval;
-    
-    // Set the initial state to game over
-    let gameOver = true; 
+    let gameOver = true;
+    let health = 100;
 
     function comeout() {
         holes.forEach(hole => {
             hole.classList.remove('mole');
-            hole.removeEventListener(
-                'click', handleMoleClick);
+            hole.removeEventListener('click', handleMoleClick);
         });
 
         let random = holes[Math.floor(Math.random() * 9)];
-
         random.classList.add('mole');
+        random.moleClicks = 0;
+
         random.addEventListener('click', handleMoleClick);
     }
 
     function handleMoleClick() {
-        if (!gameOver) {
+        if (gameOver) return;
+        this.moleClicks++;
+        if (this.moleClicks === 3) {
             score++;
             scoreDisplay.textContent = `Score: ${score}`;
+            this.classList.remove('mole');
         }
-        this.classList.remove('mole');
+    }
+
+    function decreaseHealth() {
+        if (health > 0) {
+            health -= 10; 
+            healthBar.style.width = `${health}%`;
+        }
+
+        if (health <= 0) {
+            gameOver = true;
+            clearInterval(countdown);
+            clearInterval(moleInterval);
+            alert(`Game Over!\nYour final score: ${score}`);
+            startButton.disabled = false;
+            endButton.disabled = true;
+        }
     }
 
     function startGame() {
-        if (!gameOver) {
-        
-            // Prevent starting the game 
-            // again if it's already in progress
-            return;
-        }
+        if (!gameOver) return;
 
         gameOver = false;
         score = 0;
+        health = 100; // Reset health
         scoreDisplay.textContent = `Score: ${score}`;
+        healthBar.style.width = '100%'; // Reset health bar
         timer = 60;
         timerDisplay.textContent = `Time: ${timer}s`;
 
@@ -72,6 +81,12 @@ document.addEventListener(
 
         moleInterval = setInterval(() => {
             if (!gameOver) comeout();
+            // If mole isn't clicked in a given time, decrease health
+            setTimeout(() => {
+                if (document.querySelector('.mole') && !gameOver) {
+                    decreaseHealth();
+                }
+            }, 1000);
         }, 1000);
 
         console.log("Game started");
@@ -86,6 +101,7 @@ document.addEventListener(
         timer = 60;
         scoreDisplay.textContent = `Score: ${score}`;
         timerDisplay.textContent = `Time: ${timer}s`;
+        healthBar.style.width = '100%';
         startButton.disabled = false;
         endButton.disabled = true;
     }

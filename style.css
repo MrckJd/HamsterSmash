@@ -28,6 +28,19 @@ body {
     cursor: pointer;
 }
 
+#health-bar-container {
+    width: 100%;
+    height: 30px;
+    background-color: #ccc;
+    margin: 20px 0;
+}
+
+#health-bar {
+    height: 100%;
+    width: 100%;
+    background-color: green;
+}
+
 .game-container {
     background-color: rgb(1, 254, 64);
     display: grid;
@@ -72,4 +85,5 @@ body {
         background-image: url(
 "https://media.geeksforgeeks.org/wp-content/uploads/20231130123541/mole.png")
     }
+    
 }
